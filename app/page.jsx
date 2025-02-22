@@ -1,3 +1,10 @@
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
-  return <div>Hello its start of smart notes</div>;
+  return (
+    <>
+      <div>Hello</div>
+      <Button>Click here</Button>
+    </>
+  );
 }
