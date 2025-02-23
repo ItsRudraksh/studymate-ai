@@ -1,9 +1,6 @@
 "use client";
-import { db } from "@/configs/db";
-import { usersTable } from "@/configs/schema";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
-import { eq } from "drizzle-orm";
 import React, { useEffect } from "react";
 
 function Provider({ children }) {
@@ -42,7 +39,11 @@ function Provider({ children }) {
     //   console.log(userResponse);
     // }
   };
-  return <div>{children}</div>;
+  return (
+    <div className="w-screen h-screen">
+      <div>{children}</div>
+    </div>
+  );
 }
 
 export default Provider;

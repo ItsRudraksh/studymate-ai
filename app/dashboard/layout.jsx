@@ -1,0 +1,22 @@
+import React from "react";
+import SideBar from "./_components/SideBar";
+import DashboardHeader from "./_components/DashboardHeader";
+import ModeToggle from "@/components/ModeToggle";
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+function DashboardLayout({ children }) {
+  return (
+    <SidebarProvider>
+      <SideBar />
+      <div>
+        <DashboardHeader />
+        <div className="fixed right-2 bottom-2 shadow-md">
+          <ModeToggle />
+        </div>
+        {children}
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export default DashboardLayout;

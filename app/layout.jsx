@@ -2,6 +2,8 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Provider from "./provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import ModeToggle from "@/components/ModeToggle";
 
 const OutfitSans = Outfit({
   variable: "--font--outfit--sans",
@@ -16,9 +18,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${OutfitSans.variable} antialiased`}>
-          <Provider>{children}</Provider>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${OutfitSans.variable} antialiased overflow-x-hidden`}
+        >
+          <Provider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              {children}
+            </ThemeProvider>
+          </Provider>
         </body>
       </html>
     </ClerkProvider>
