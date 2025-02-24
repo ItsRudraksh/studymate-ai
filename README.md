@@ -1,4 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Smart Notes
+
+This is a Next.js project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Description
+
+Smart Notes is a web application that helps users create and manage notes. It provides features such as:
+
+*   User authentication
+*   Course outline generation using AI
+*   A dashboard for managing notes
+*   A sidebar for easy navigation
+*   UI components built with Radix UI
+*   Integration with Inngest for background tasks
 
 ## Getting Started
 
@@ -20,12 +33,30 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Features
+
+*   **User Authentication:** Users can create accounts and log in to the application to manage their notes.
+*   **Course Outline Generation:** The application can generate course outlines using AI.
+*   **Dashboard:** The dashboard provides a central location for users to manage their notes.
+*   **Sidebar:** The sidebar provides easy navigation to different sections of the application.
+*   **UI Components:** The application uses Radix UI for its UI components, providing a consistent and accessible user experience.
+*   **Inngest Integration:** The application uses Inngest for background tasks, such as sending email notifications.
+
+## Technologies Used
+
+*   Next.js
+*   Radix UI
+*   Inngest
+*   Drizzle ORM
+*   PostgreSQL
+*   Clerk
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+*   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
