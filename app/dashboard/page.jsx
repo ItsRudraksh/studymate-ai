@@ -7,9 +7,9 @@ export default function Dashboard() {
   const { user } = useUser();
 
   return (
-    <div className="p-8">
+    <div className="px-2">
       {/* Welcome Banner */}
-      <Card className="w-full bg-blue-500 text-white p-6 mb-8">
+      <Card className="w-full bg-blue-500 text-white p-6">
         <div className="flex items-center gap-4">
           <div className="p-4 bg-blue-600 rounded-lg">
             <Laptop className="w-8 h-8" />
@@ -19,14 +19,14 @@ export default function Dashboard() {
               Hello, {user?.fullName || "User"}
             </h1>
             <p className="text-blue-100">
-              Welcome Back, Its time to learn new coursr
+              Welcome Back, Its time to learn new course
             </p>
           </div>
         </div>
       </Card>
 
       {/* Content Area */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-8">
         {/* Add your dashboard cards here */}
       </div>
     </div>

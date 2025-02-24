@@ -1,4 +1,4 @@
-import { LayoutDashboard, Plus, Shield, User, Zap } from "lucide-react";
+import { LayoutDashboard, Plus, Shield, User, Notebook } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -38,12 +38,15 @@ function SideBar() {
         <div className="p-4">
           <div className="flex items-center gap-2 px-2">
             <div className="bg-blue-500 p-2 rounded-lg">
-              <Zap className="w-4 h-4 text-white" />
+              <Notebook className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-lg">LOGO</span>
+            <span className="font-semibold text-lg">Smart Notes</span>
           </div>
-          <Button className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
-            <Plus className="mr-2 h-4 w-4" /> Create New
+          <Button asChild className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
+            <a href="/create">
+              <Plus strokeWidth={3} className="h-4 w-4" />
+              Create New
+            </a>
           </Button>
         </div>
 
