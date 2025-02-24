@@ -1,65 +1,54 @@
-import React from "react";
-import {
-  Calendar,
-  ChevronUp,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  User2,
-} from "lucide-react";
+import { LayoutDashboard, Plus, Shield, User, Zap } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"; // ✅ Import Popover
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const items = [
   {
-    title: "Home",
-    url: "#",
-    icon: Home,
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Upgrade",
+    url: "/dashboard/upgrade",
+    icon: Shield,
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: User,
   },
 ];
 
 function SideBar() {
   return (
     <div>
-      <Sidebar variant="sidebar" collapsible="icon">
+      <Sidebar variant="sidebar">
+        {/* Logo */}
+        <div className="p-4">
+          <div className="flex items-center gap-2 px-2">
+            <div className="bg-blue-500 p-2 rounded-lg">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold text-lg">LOGO</span>
+          </div>
+          <Button className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
+            <Plus className="mr-2 h-4 w-4" /> Create New
+          </Button>
+        </div>
+
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => (
@@ -77,34 +66,23 @@ function SideBar() {
           </SidebarGroup>
         </SidebarContent>
 
-        {/* ✅ Sidebar Footer with Popover */}
+        {/* Credits Card */}
         <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 /> Username
-                    <ChevronUp className="ml-auto" />
-                  </SidebarMenuButton>
-                </PopoverTrigger>
-
-                {/* ✅ Matches Trigger Width */}
-                <PopoverContent className="w-[--radix-popper-anchor-width] p-0">
-                  <div className="flex flex-col">
-                    {["Profile", "Settings", "Logout"].map((option) => (
-                      <button
-                        key={option}
-                        className="text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700"
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <div className="p-4">
+            <div className="rounded-lg border p-4">
+              <h3 className="font-semibold mb-2">Available Credits: 5</h3>
+              <Progress value={(3 / 5) * 100} className="h-2 mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                2 Out of 5 Credits Used
+              </p>
+              <a
+                href="/dashboard/upgrade"
+                className="text-sm text-blue-500 hover:underline"
+              >
+                Upgrade to create more
+              </a>
+            </div>
+          </div>
         </SidebarFooter>
       </Sidebar>
     </div>

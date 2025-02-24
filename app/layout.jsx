@@ -2,8 +2,6 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Provider from "./provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import ModeToggle from "@/components/ModeToggle";
 
 const OutfitSans = Outfit({
   variable: "--font--outfit--sans",
@@ -22,11 +20,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${OutfitSans.variable} antialiased overflow-x-hidden`}
         >
-          <Provider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              {children}
-            </ThemeProvider>
-          </Provider>
+          <Provider>{children}</Provider>
         </body>
       </html>
     </ClerkProvider>
