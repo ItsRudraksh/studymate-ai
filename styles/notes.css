@@ -1,0 +1,210 @@
+/* Base styles */
+:root {
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --background-dark: #1a1a1a;
+  --background-light: #2d2d2d;
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --border-color: #404040;
+  --code-background: #2d2d2d;
+  --code-border: #404040;
+  --link-color: #60a5fa;
+  --link-hover: #3b82f6;
+  --heading-color: #f3f4f6;
+  --list-marker: #9ca3af;
+}
+
+/* Main container */
+.notes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--background-dark);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Headings */
+h2 {
+  color: var(--heading-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+h3 {
+  color: var(--heading-color);
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h4 {
+  color: var(--heading-color);
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+/* Paragraphs */
+p {
+  margin: 1rem 0;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+/* Lists */
+ul,
+ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: var(--text-primary);
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+li {
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+}
+
+/* Code blocks */
+pre {
+  background-color: var(--code-background);
+  padding: 1rem;
+  border: 1px solid var(--code-border);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+code {
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+/* Inline code */
+p code {
+  background-color: var(--code-background);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background-color: var(--background-light);
+}
+
+th,
+td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: var(--background-dark);
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+td {
+  color: var(--text-primary);
+}
+
+/* Links */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+/* Bold text */
+b,
+strong {
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+/* Italic text */
+i,
+em {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 4px solid var(--primary-color);
+  margin: 1rem 0;
+  padding-left: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .notes-container {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  pre {
+    padding: 0.75rem;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}

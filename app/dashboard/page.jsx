@@ -2,6 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { useUser } from "@clerk/nextjs";
 import { Laptop } from "lucide-react";
+import CourseList from "./_components/CourseList";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -26,8 +27,9 @@ export default function Dashboard() {
       </Card>
 
       {/* Content Area */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-8">
+      <div>
         {/* Add your dashboard cards here */}
+        <CourseList />
       </div>
     </div>
   );

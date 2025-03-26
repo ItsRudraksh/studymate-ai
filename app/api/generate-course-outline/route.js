@@ -1,6 +1,7 @@
 import { db } from "@/configs/db"
 import { createCourse } from "@/configs/gemini"
 import { notesTable } from "@/configs/schema"
+import { inngest } from "@/inngest/client"
 import { NextResponse } from "next/server"
 
 export async function POST(request) {
@@ -37,7 +38,16 @@ export async function POST(request) {
         courseContent: aiRes,
         difficulty: difficulty,
       })
-      .returning()
+      .returning({ resp: notesTable })
+
+    const result = inngest.send({
+      name: "generate.chapter.notes",
+      data: {
+        course: dbRes[0].resp
+      }
+    })
+    console.log("Inngest response:", result.resp);
+
 
     console.log("Database insertion successful:", dbRes)
     return NextResponse.json({ result: dbRes })

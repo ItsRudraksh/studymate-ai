@@ -1,4 +1,4 @@
-import { pgTable, varchar, boolean, json, uuid } from "drizzle-orm/pg-core";
+import { pgTable, varchar, boolean, json, uuid, integer, text } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: varchar().primaryKey(),
@@ -10,11 +10,18 @@ export const usersTable = pgTable("users", {
 
 export const notesTable = pgTable("notes", {
   id: varchar().primaryKey(),
-  courseId: uuid().notNull(),
+  courseId: varchar().notNull(),
   courseType: varchar().notNull(),
   topic: varchar().notNull(),
   difficulty: varchar().default("Medium"),
   courseContent: json(),
   createdBy: varchar().notNull(),
   status: varchar().default("Generating")
+})
+
+export const chapterContentTable = pgTable("chapterContent", {
+  id: varchar().primaryKey(),
+  courseId: varchar().notNull(),
+  chapterId: integer().notNull(),
+  chapterContent: text(),
 })
