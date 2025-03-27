@@ -4,10 +4,14 @@ import { Book, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 function CourseCard({ course }) {
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, filter: "blur(10px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      transition={{ duration: 1, delay: 0.1 }}>
       <Card className="h-56 rounded-lg shadow-md">
         <div className="flex flex-col space-y-2 p-4">
           <Book className="h-6 w-6 text-gray-700" />
@@ -40,7 +44,7 @@ function CourseCard({ course }) {
           </div>
         </div>
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

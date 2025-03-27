@@ -15,7 +15,7 @@ export function StudyMaterial({ courseData }) {
             <p className="text-sm text-gray-500 mb-4">
               Read Notes to prepare for exam
             </p>
-            <Link href={"#chapters"}>
+            <Link href={`/course/${courseData?.courseId}/notes`}>
               <Button className="w-full">
                 {courseData?.status === "Generated" ? "View" : "Generate"}
               </Button>
@@ -29,9 +29,10 @@ export function StudyMaterial({ courseData }) {
             <div className="mb-4">🎴</div>
             <h3 className="font-semibold">Flashcards</h3>
             <Button
+              disabled={true}
               variant="outline"
               className="w-full mt-4">
-              Generate
+              Generate (Add in next Phase)
             </Button>
           </CardContent>
         </Card>
@@ -42,9 +43,10 @@ export function StudyMaterial({ courseData }) {
             <div className="mb-4">📝</div>
             <h3 className="font-semibold">Quiz</h3>
             <Button
+              disabled={true}
               variant="outline"
               className="w-full mt-4">
-              Generate
+              Generate (Add in next Phase)
             </Button>
           </CardContent>
         </Card>
@@ -55,9 +57,10 @@ export function StudyMaterial({ courseData }) {
             <div className="mb-4">❓</div>
             <h3 className="font-semibold">Question/Answer</h3>
             <Button
+              disabled={true}
               variant="outline"
               className="w-full mt-4">
-              Generate
+              Generate (Add in next Phase)
             </Button>
           </CardContent>
         </Card>
