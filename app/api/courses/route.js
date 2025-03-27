@@ -24,8 +24,6 @@ export async function GET(req) {
         { status: 400 }
       );
     }
-
-    console.log("Fetching course with ID:", courseId);
     const course = await db
       .select()
       .from(notesTable)
@@ -35,10 +33,8 @@ export async function GET(req) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
-    console.log("Found course:", course[0]);
     return NextResponse.json({ result: course[0] });
   } catch (error) {
-    console.error("Error fetching course:", error);
     return NextResponse.json(
       { error: "Failed to fetch course" },
       { status: 500 }

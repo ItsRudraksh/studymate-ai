@@ -1,67 +1,188 @@
-# Smart Notes
+# StudyMate AI
 
-This is a Next.js project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+StudyMate AI is an AI-powered study material generation platform that helps users create structured learning content for various purposes, from exam preparation to job-related topics.
 
-## Description
+## 🚀 Features
 
-Smart Notes is a web application that helps users create and manage notes. It provides features such as:
+### Core Features
 
-*   User authentication
-*   Course outline generation using AI
-*   A dashboard for managing notes
-*   A sidebar for easy navigation
-*   UI components built with Radix UI
-*   Integration with Inngest for background tasks
+- **AI-Powered Course Generation**
 
-## Getting Started
+  - Automatic course outline generation
+  - Chapter-wise content generation
+  - Structured study material creation
+  - Background processing for content generation
 
-First, run the development server:
+- **User Management**
+
+  - Secure authentication with Clerk
+  - User profiles and session management
+  - Personalized dashboard
+
+- **Course Management**
+
+  - Create new study materials/courses
+  - Categorize content (Exam, Job, Coding, Other)
+  - Set difficulty levels (Easy, Medium, Hard)
+  - Real-time status updates
+
+- **Dashboard**
+  - Personalized welcome screen
+  - Course listing and management
+  - Progress tracking
+  - Real-time status updates
+
+## 🏗️ Architecture
+
+### System Architecture
+
+```mermaid
+graph TD
+    A[Client Browser] --> B[Next.js Frontend]
+    B --> C[Next.js API Routes]
+    C --> D[PostgreSQL Database]
+    C --> E[Google Gemini AI]
+    C --> F[Inngest Background Jobs]
+    F --> G[Chapter Content Generation]
+    G --> D
+```
+
+### Database Schema
+
+```mermaid
+erDiagram
+    users ||--o{ notes : creates
+    notes ||--o{ chapterContent : contains
+    users {
+        string id PK
+        string name
+        string email
+        boolean isMember
+    }
+    notes {
+        string id PK
+        string courseId
+        string courseType
+        string topic
+        string difficulty
+        json courseContent
+        string createdBy
+        string status
+    }
+    chapterContent {
+        string id PK
+        string courseId
+        integer chapterId
+        text chapterContent
+    }
+```
+
+### Course Generation Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant AI
+    participant DB
+    participant Background
+
+    User->>Frontend: Create Course
+    Frontend->>API: Submit Course Details
+    API->>AI: Generate Course Outline
+    AI-->>API: Return Course Structure
+    API->>DB: Store Course Metadata
+    API->>Background: Trigger Content Generation
+    Background->>AI: Generate Chapter Content
+    Background->>DB: Store Chapter Content
+    Background-->>Frontend: Update Status
+    Frontend-->>User: Show Progress
+```
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- Next.js 15.1.7
+- React 19
+- TailwindCSS
+- Radix UI Components
+- Framer Motion
+
+### Backend
+
+- Next.js API Routes
+- PostgreSQL (NeonDB)
+- Drizzle ORM
+- Clerk Authentication
+- Google Generative AI (Gemini)
+- Inngest Background Processing
+
+## 🚀 Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+
+```bash
+cp .env.sample .env
+# Fill in your environment variables
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 📝 Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Required environment variables:
 
-## Features
+- `DATABASE_URL`: PostgreSQL connection string
+- `CLERK_SECRET_KEY`: Clerk authentication secret
+- `GOOGLE_API_KEY`: Google Gemini AI API key
+- `INNGEST_EVENT_KEY`: Inngest background job key
 
-*   **User Authentication:** Users can create accounts and log in to the application to manage their notes.
-*   **Course Outline Generation:** The application can generate course outlines using AI.
-*   **Dashboard:** The dashboard provides a central location for users to manage their notes.
-*   **Sidebar:** The sidebar provides easy navigation to different sections of the application.
-*   **UI Components:** The application uses Radix UI for its UI components, providing a consistent and accessible user experience.
-*   **Inngest Integration:** The application uses Inngest for background tasks, such as sending email notifications.
+## 🔒 Security
 
-## Technologies Used
+- Authentication handled by Clerk
+- Secure API routes
+- Environment variable protection
+- Database connection security
 
-*   Next.js
-*   Radix UI
-*   Inngest
-*   Drizzle ORM
-*   PostgreSQL
-*   Clerk
+## 📦 Project Structure
 
-## Learn More
+```
+studymate-ai/
+├── app/
+│   ├── api/           # API routes
+│   ├── dashboard/     # Dashboard pages
+│   ├── create/        # Course creation
+│   └── (auth)/        # Authentication pages
+├── components/        # Reusable components
+├── configs/          # Configuration files
+├── hooks/            # Custom React hooks
+├── lib/              # Utility functions
+└── styles/           # Global styles
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🤝 Contributing
 
-*   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-*   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the LICENSE file for details.

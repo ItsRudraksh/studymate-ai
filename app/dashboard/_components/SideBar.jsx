@@ -40,11 +40,16 @@ function SideBar() {
             <div className="bg-blue-500 p-2 rounded-lg">
               <Notebook className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-lg">Smart Notes</span>
+            <span className="font-semibold text-lg">StudyMate AI</span>
           </div>
-          <Button asChild className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
+          <Button
+            asChild
+            className="w-full mt-4 bg-blue-500 hover:bg-blue-600">
             <a href="/create">
-              <Plus strokeWidth={3} className="h-4 w-4" />
+              <Plus
+                strokeWidth={3}
+                className="h-4 w-4"
+              />
               Create New
             </a>
           </Button>
@@ -74,14 +79,16 @@ function SideBar() {
           <div className="p-4">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold mb-2">Available Credits: 5</h3>
-              <Progress value={(3 / 5) * 100} className="h-2 mb-2" />
+              <Progress
+                value={(3 / 5) * 100}
+                className="h-2 mb-2"
+              />
               <p className="text-sm text-muted-foreground mb-2">
                 2 Out of 5 Credits Used
               </p>
               <a
                 href="/dashboard/upgrade"
-                className="text-sm text-blue-500 hover:underline"
-              >
+                className="text-sm text-blue-500 hover:underline">
                 Upgrade to create more
               </a>
             </div>

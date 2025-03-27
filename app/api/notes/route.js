@@ -22,7 +22,6 @@ export async function GET(req) {
 
     return NextResponse.json({ notes });
   } catch (error) {
-    console.error("Error fetching notes:", error);
     return NextResponse.json(
       { error: "Failed to fetch notes" },
       { status: 500 }

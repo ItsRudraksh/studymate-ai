@@ -9,15 +9,11 @@ export const createNewUser = inngest.createFunction(
   { id: "create-user" },
   { event: "create.user" },
   async ({ event, step }) => {
-    console.log("data before call: " + event.data);
     const { user } = event.data;
-    console.log("User before call: " + user);
     await step.run("Create user if not exists", async () => {
       if (!user) {
-        console.log("No user found");
         return;
       }
-      console.log("User in call: " + user);
 
       const result = await db
         .select()
@@ -37,8 +33,6 @@ export const createNewUser = inngest.createFunction(
             email,
           })
           .returning({ id: usersTable.id });
-
-        console.log(userResponse);
       }
     });
     return "User Creation Successfull";

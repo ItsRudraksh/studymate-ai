@@ -75,7 +75,7 @@ function CourseList() {
           } else {
             setCourseList(updatedRes.data.result);
           }
-        }, 30000);
+        }, 10000);
 
         setTimeout(() => {
           clearInterval(pollInterval);

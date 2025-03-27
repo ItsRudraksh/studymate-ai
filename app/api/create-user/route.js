@@ -22,7 +22,6 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error sending event:", error);
     return NextResponse.json(
       { error: "Failed to send user creation event" },
       { status: 500 }

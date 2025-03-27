@@ -27,13 +27,13 @@ export function BreadcrumbNav({ items }) {
         {items.map((item, index) => (
           <BreadcrumbItem key={index}>
             {index === items.length - 1 ? (
-              <BreadcrumbPage className="capitalize">
+              <BreadcrumbPage className="capitalize line-clamp-1 text-ellipsis">
                 {item.label}
               </BreadcrumbPage>
             ) : (
               <>
                 <BreadcrumbLink
-                  className="capitalize"
+                  className="capitalize line-clamp-1 text-ellipsis"
                   href={item.href}>
                   {item.label}
                 </BreadcrumbLink>
