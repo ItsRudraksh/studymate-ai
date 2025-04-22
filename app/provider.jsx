@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import axios from "axios";
 import { useEffect } from "react";
+import { CourseProvider } from "./context/CourseContext";
 
 function Provider({ children }) {
   const { user } = useUser();
@@ -26,13 +27,18 @@ function Provider({ children }) {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <div className="w-screen h-screen">
-        <div className="fixed right-2 bottom-2 shadow-md">
-          <ModeToggle />
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem>
+      <CourseProvider>
+        <div className="w-screen h-screen">
+          <div className="fixed right-2 bottom-2 shadow-md z-[1000]">
+            <ModeToggle />
+          </div>
+          <div>{children}</div>
         </div>
-        <div>{children}</div>
-      </div>
+      </CourseProvider>
     </ThemeProvider>
   );
 }

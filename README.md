@@ -27,10 +27,27 @@ StudyMate AI is an AI-powered study material generation platform that helps user
   - Real-time status updates
 
 - **Dashboard**
+
   - Personalized welcome screen
   - Course listing and management
   - Progress tracking
   - Real-time status updates
+  - **Search and Filtering** (NEW)
+    - Filter courses by category (All, Coding, Exam, Job, Other)
+    - Search courses by title and description
+    - Real-time filtering with result count indicators
+
+- **Study Materials** (NEW)
+  - **Notes**
+    - Chapter-by-chapter structured content
+    - Desktop and mobile-friendly sidebar navigation
+    - Auto-scroll to top when switching chapters
+  - **Flashcards**
+    - Customizable number of flashcard generation (5, 10, 15, 20, 25)
+    - Interactive 3D flip animations with gradient effects
+    - Circular navigation (loop from last card to first)
+    - Motion effects and transitions
+    - Mobile responsive design
 
 ## 🏗️ Architecture
 
@@ -44,7 +61,9 @@ graph TD
     C --> E[Google Gemini AI]
     C --> F[Inngest Background Jobs]
     F --> G[Chapter Content Generation]
+    F --> H[Flashcards Generation]
     G --> D
+    H --> D
 ```
 
 ### Database Schema
@@ -53,6 +72,7 @@ graph TD
 erDiagram
     users ||--o{ notes : creates
     notes ||--o{ chapterContent : contains
+    notes ||--o{ studyType : has
     users {
         string id PK
         string name
@@ -68,12 +88,19 @@ erDiagram
         json courseContent
         string createdBy
         string status
+        boolean flashcardsGenerated
     }
     chapterContent {
         string id PK
         string courseId
         integer chapterId
         text chapterContent
+    }
+    studyType {
+        string id PK
+        string courseId
+        string type
+        json content
     }
 ```
 
@@ -100,6 +127,42 @@ sequenceDiagram
     Frontend-->>User: Show Progress
 ```
 
+### Study Materials Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Dashboard
+    participant Course
+    participant API
+    participant AI
+    participant DB
+
+    User->>Dashboard: Browse Courses
+    Dashboard->>User: Filtered & Searchable Course List
+    User->>Course: Select Course
+    Course->>User: Display Study Options
+
+    alt Generate Notes
+        Course->>API: Request Notes Generation
+        API->>AI: Generate Chapter Content
+        AI-->>API: Return Generated Content
+        API->>DB: Store Content
+        API-->>Course: Update Status
+        Course-->>User: Display Notes
+    end
+
+    alt Generate Flashcards
+        User->>Course: Select Flashcard Count
+        Course->>API: Request Flashcards Generation
+        API->>AI: Generate Flashcards
+        AI-->>API: Return Generated Flashcards
+        API->>DB: Store Flashcards
+        API-->>Course: Update Status
+        Course-->>User: Display Interactive Flashcards
+    end
+```
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -109,6 +172,7 @@ sequenceDiagram
 - TailwindCSS
 - Radix UI Components
 - Framer Motion
+- 3D Transformations and Animations
 
 ### Backend
 
@@ -164,15 +228,21 @@ Required environment variables:
 ```
 studymate-ai/
 ├── app/
-│   ├── api/           # API routes
-│   ├── dashboard/     # Dashboard pages
-│   ├── create/        # Course creation
-│   └── (auth)/        # Authentication pages
-├── components/        # Reusable components
-├── configs/          # Configuration files
-├── hooks/            # Custom React hooks
-├── lib/              # Utility functions
-└── styles/           # Global styles
+│   ├── api/                # API routes
+│   ├── dashboard/          # Dashboard pages
+│   │   └── _components/    # Dashboard components
+│   ├── create/             # Course creation
+│   ├── course/             # Course pages
+│   │   ├── [courseId]/     # Dynamic course routes
+│   │   │   ├── notes/      # Notes pages and components
+│   │   │   └── flashcards/ # Flashcards pages and components
+│   │   └── _components/    # Shared course components
+│   └── (auth)/             # Authentication pages
+├── components/             # Reusable components
+├── configs/                # Configuration files
+├── hooks/                  # Custom React hooks
+├── lib/                    # Utility functions
+└── styles/                 # Global styles
 ```
 
 ## 🤝 Contributing

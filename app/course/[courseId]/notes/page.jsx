@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ChapterSidebar } from "./_components/ChapterSidebar";
 import { ChapterContent } from "./_components/ChapterContent";
@@ -56,11 +56,25 @@ export default function NotesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [courseData, setCourseData] = useState(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     fetchNotes();
     fetchCourse();
   }, [courseId]);
+
+  // Scroll to top when active chapter changes
+  useEffect(() => {
+    if (activeChapter) {
+      // Scroll main content to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // For desktop view, also scroll the content div if it exists
+      if (contentRef.current) {
+        contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  }, [activeChapter]);
 
   const fetchCourse = async () => {
     try {
@@ -86,6 +100,11 @@ export default function NotesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Define a function to handle chapter changes that we'll pass to ChapterSidebar
+  const handleChapterChange = (chapter) => {
+    setActiveChapter(chapter);
   };
 
   const breadcrumbItems = [
@@ -120,9 +139,11 @@ export default function NotesPage() {
       <ChapterSidebar
         notes={notes}
         activeChapter={activeChapter}
-        setActiveChapter={setActiveChapter}
+        setActiveChapter={handleChapterChange}
       />
-      <main className="flex-1 p-6 md:ml-[240px] overflow-x-hidden">
+      <main
+        className="flex-1 p-6 md:ml-[240px] overflow-x-hidden"
+        ref={contentRef}>
         <div className="max-w-4xl mx-auto">
           <BreadcrumbNav items={breadcrumbItems} />
           <ChapterContent chapter={activeChapter} />

@@ -62,3 +62,92 @@ export const genChapterNotes = model.startChat({
     },
   ],
 });
+
+export const genFlashCards = model.startChat({
+  generationConfig: {
+    temperature: 1,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+  },
+  history: [
+    {
+      role: "user",
+      parts: [
+        {
+          text: `Generate up to 15 flashcards based on the main topic: Java oops, using the following subtopics for context: [Fundamentals of Object-Oriented Programming, Inheritance and Polymorphism, Interfaces and Abstract Classes, Exception Handling, Object-Oriented Design Principles]. Format the output as a JSON array, where each flashcard includes a front and back field. The overall complexity level of the flashcards is Medium (easy, medium, hard). Tailor the content to the following use-case: coding (coding, job, exam, general). Keep the flashcards concise and focused on quick review. Avoid including examples or diagrams unless absolutely necessary.`,
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {
+          text: `[
+  {
+    "front": "What are the four pillars of OOP?",
+    "back": "Abstraction, Encapsulation, Inheritance, Polymorphism"
+  },
+  {
+    "front": "Define Encapsulation.",
+    "back": "Bundling data (attributes) and methods that operate on the data within a class, hiding the internal state of an object."
+  },
+  {
+    "front": "What is Inheritance?",
+    "back": "A mechanism where a new class (subclass) inherits properties and behaviors from an existing class (superclass)."
+  },
+  {
+    "front": "Explain Polymorphism.",
+    "back": "The ability of an object to take on many forms; using a single interface to represent different underlying forms (method overloading and overriding)."
+  },
+  {
+    "front": "What is method overriding?",
+    "back": "A subclass provides a specific implementation for a method that is already defined in its superclass."
+  },
+  {
+    "front": "What is method overloading?",
+    "back": "Defining multiple methods in the same class with the same name but different parameters."
+  },
+  {
+    "front": "What is an Interface?",
+    "back": "A contract that specifies a set of methods that a class must implement. It defines 'what' to do, not 'how'."
+  },
+  {
+    "front": "What is an Abstract Class?",
+    "back": "A class that cannot be instantiated and may contain abstract methods (methods without implementation)."
+  },
+  {
+    "front": "Difference between Interface and Abstract Class.",
+    "back": "Interface provides full abstraction (all methods are abstract), while Abstract Class provides partial abstraction (can have concrete methods)."
+  },
+  {
+    "front": "What is Exception Handling?",
+    "back": "A mechanism to handle runtime errors and maintain the program's flow. Using try-catch-finally blocks."
+  },
+  {
+    "front": "What are checked vs. unchecked exceptions?",
+    "back": "Checked exceptions must be handled or declared, unchecked exceptions do not need to be. (Checked are subclasses of Exception, Unchecked are subclasses of RuntimeException)"
+  },
+  {
+    "front": "What is the purpose of the 'finally' block?",
+    "back": "It guarantees that a block of code is executed regardless of whether an exception is thrown or caught."
+  },
+  {
+    "front": "What is the Single Responsibility Principle (SRP)?",
+    "back": "A class should have only one reason to change."
+  },
+  {
+    "front": "What is the Open/Closed Principle (OCP)?",
+    "back": "Software entities should be open for extension, but closed for modification."
+  },
+  {
+    "front": "What is the Liskov Substitution Principle (LSP)?",
+    "back": "Subtypes must be substitutable for their base types without altering the correctness of the program."
+  }
+]`,
+        },
+      ],
+    },
+  ],
+});

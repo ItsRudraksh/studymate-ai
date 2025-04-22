@@ -1,8 +1,13 @@
 import { db } from "@/configs/db";
 import { inngest } from "./client";
-import { chapterContentTable, notesTable, usersTable } from "@/configs/schema";
+import {
+  chapterContentTable,
+  notesTable,
+  studyTypeTable,
+  usersTable,
+} from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import { genChapterNotes } from "@/configs/gemini";
+import { genChapterNotes, genFlashCards } from "@/configs/gemini";
 import { v4 as uuid } from "uuid";
 
 export const createNewUser = inngest.createFunction(
@@ -105,5 +110,44 @@ export const generateChapterNotes = inngest.createFunction(
         .where(eq(notesTable.courseId, course?.courseId));
       return "Status updated successfully";
     });
+  }
+);
+
+export const generateStudyType = inngest.createFunction(
+  { id: "generate-study-type-content" },
+  { event: "generate.study.type.content" },
+  async ({ event, step }) => {
+    const { studyType, prompt, courseId } = event.data;
+
+    const flashCardAIRes = await step.run("Generating Flashcards", async () => {
+      const res = await genFlashCards.sendMessage(prompt);
+      const aiRes = JSON.parse(res.response.text());
+      return aiRes;
+    });
+
+    const updateStudyType = await step.run("Updating Study Type", async () => {
+      await db
+        .update(studyTypeTable)
+        .set({
+          content: flashCardAIRes,
+        })
+        .where(eq(studyTypeTable.courseId, courseId))
+        .where(eq(studyTypeTable.studyType, studyType));
+      return "Study Type Updated Successfully";
+    });
+
+    // Update notes status to indicate flashcards generation is complete
+    if (studyType === "flashcards") {
+      const updateStatus = await step.run(
+        "Update Flashcards Status",
+        async () => {
+          await db
+            .update(notesTable)
+            .set({ flashcardsGenerated: true })
+            .where(eq(notesTable.courseId, courseId));
+          return "Flashcards Status Updated Successfully";
+        }
+      );
+    }
   }
 );
