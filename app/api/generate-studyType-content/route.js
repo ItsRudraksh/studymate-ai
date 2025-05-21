@@ -63,16 +63,7 @@ Notes:
     return NextResponse.json({ error: "Invalid study type" }, { status: 400 });
   }
 
-  const res = await db
-    .insert(studyTypeTable)
-    .values({
-      id: uuid(),
-      courseId,
-      studyType,
-    })
-    .returning({ id: studyTypeTable.id });
-
-  inngest.send({
+  await inngest.send({
     name: "generate.study.type.content",
     data: {
       studyType: studyType,
@@ -80,5 +71,7 @@ Notes:
       courseId: courseId,
     },
   });
-  return NextResponse.json(res);
+  return NextResponse.json({
+    message: "Study material generation queued successfully.",
+  });
 }

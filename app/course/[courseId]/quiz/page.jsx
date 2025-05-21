@@ -32,6 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css"; // Or your preferred theme for dark mode
 
 function QuizLoadingSkeleton() {
   return (
@@ -78,6 +82,11 @@ export default function QuizPage() {
 
   const { toast } = useToast();
   const { quizState, updateQuizState } = useCourseContext();
+
+  const allQuestionsAnswered =
+    quizData &&
+    quizData.length > 0 &&
+    Object.keys(userAnswers).length === quizData.length;
 
   const isGeneratingQuiz =
     quizState.isGenerating && quizState.courseId === courseId;
@@ -151,6 +160,15 @@ export default function QuizPage() {
   };
 
   const handleSubmitQuiz = () => {
+    if (!allQuestionsAnswered) {
+      toast({
+        title: "Incomplete Quiz",
+        description: "Please answer all questions before submitting.",
+        variant: "default", // Or "warning" if you add such a variant to your toast component
+      });
+      return;
+    }
+
     let calculatedScore = 0;
     quizData.forEach((question, index) => {
       if (userAnswers[index] === question.correctAnswer) {
@@ -398,9 +416,13 @@ export default function QuizPage() {
           className="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle className="text-lg">Question {qIndex + 1}</CardTitle>
-            <CardDescription className="text-md pt-2">
-              {question.question}
-            </CardDescription>
+            <div className="text-md pt-2 prose dark:prose-invert max-w-none prose-pre:bg-[#0d1117] prose-pre:p-4 prose-pre:rounded-lg">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeHighlight]}>
+                {question.question}
+              </ReactMarkdown>
+            </div>
           </CardHeader>
           <CardContent>
             <RadioGroup
@@ -459,7 +481,13 @@ export default function QuizPage() {
                 <p className="text-sm font-semibold text-gray-200">
                   Explanation:
                 </p>
-                <p className="text-sm text-gray-400">{question.explanation}</p>
+                <div className="text-sm text-gray-400 prose dark:prose-invert max-w-none prose-p:mt-0 prose-p:mb-2 prose-pre:bg-[#0d1117] prose-pre:p-2 prose-pre:rounded-md prose-pre:text-sm">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}>
+                    {question.explanation}
+                  </ReactMarkdown>
+                </div>
                 {userAnswers[qIndex] !== question.correctAnswer && (
                   <p className="text-sm text-green-400 mt-1">
                     Correct Answer: {question.correctAnswer}
@@ -471,12 +499,12 @@ export default function QuizPage() {
         </Card>
       ))}
 
-      {!submitted && quizData.length > 0 && (
+      {!submitted && quizData && quizData.length > 0 && (
         <div className="mt-8 text-center">
           <Button
             onClick={handleSubmitQuiz}
             size="lg"
-            className="px-10 py-6 text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:opacity-90">
+            className={`px-10 py-6 text-lg bg-gradient-to-r from-green-500 to-teal-500 hover:opacity-90`}>
             Submit Quiz
           </Button>
         </div>

@@ -57,6 +57,7 @@ StudyMate AI is an AI-powered study material generation platform that helps user
     - Option to retake quiz
     - "Clear Answer" functionality for individual questions
     - Responsive design for various screen sizes
+    - Submission requires all questions to be answered (toast notification for incomplete attempts)
 
 ## 🏗️ Architecture
 
@@ -82,8 +83,8 @@ graph TD
 ```mermaid
 erDiagram
     users ||--o{ notes : creates
-    notes ||--o{ chapterContent : contains
-    notes ||--o{ studyTypeTable : "has study materials"
+    notes ||--o{ chapterContent : "contains chapters"
+    notes }|--|| studyTypeTable : "has one entry for"
 
     users {
         string id PK "User ID (from Clerk)"
@@ -94,12 +95,12 @@ erDiagram
 
     notes {
         string id PK "Unique Course ID (UUID)"
-        string courseId "Duplicate of ID for clarity, or actual foreign key if structure differs"
+        string courseId "Often a duplicate of 'id' for convenience or legacy"
         string courseType "Category (Exam, Job, Coding, Other)"
         string topic "Main topic/title of the course"
         string difficulty "Difficulty level (Easy, Medium, Hard)"
         json courseContent "Overall course structure, chapters, outline"
-        string createdBy "User ID of the creator"
+        string createdBy FK "User ID of the creator, references users.id"
         string status "Generation status (e.g., Pending, Generating, Completed)"
         boolean flashcardsGenerated "Flag if flashcards are ready"
         boolean quizGenerated "Flag if quiz is ready"
@@ -107,18 +108,16 @@ erDiagram
 
     chapterContent {
         string id PK "Unique ID for chapter content"
-        string courseId FK "Links to notes table"
+        string courseId FK "Links to notes.id (course ID)"
         integer chapterId "Sequential chapter number"
-        text chapterContent "Detailed content of the chapter"
+        text chapterContent "Detailed HTML content of the chapter"
         string title "Chapter Title"
     }
 
     studyTypeTable {
-        string id PK "Unique ID for study material instance (UUID)"
-        string courseId FK "Links to notes table (course)"
-        string studyType FK "Type of study material (e.g., 'flashcards', 'quiz')"
-        json flashcardContent "JSON content for flashcards"
-        json quizContent "JSON content for quizzes"
+        string courseId PK "Primary Key, links to notes.id"
+        json flashcardContent "JSON content for flashcards (nullable)"
+        json quizContent "JSON content for quizzes (nullable)"
     }
 ```
 
@@ -137,10 +136,10 @@ sequenceDiagram
     Frontend->>API: Submit Course Details
     API->>AI: Generate Course Outline (chapters, titles)
     AI-->>API: Return Course Structure
-    API->>DB: Store Course Metadata (notes table: topic, status='Pending', etc.)
+    API->>DB: Store Course Metadata (notes table: topic, status='Pending', etc., createdBy=user.id)
     API->>Background: Trigger Full Content Generation (courseId, chapters list)
-    Background->>AI: Generate Content for Each Chapter
-    Background->>DB: Store Chapter Content (chapterContent table)
+    Background->>AI: Generate HTML Content for Each Chapter
+    Background->>DB: Store Chapter Content (chapterContent table, linked to courseId)
     Background->>API: (Optional) Update chapter generation status
     API->>DB: Update Course Status (notes table: status='Completed')
     Frontend-->>User: Show Progress & Completion
@@ -152,8 +151,8 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant Frontend_CoursePage
-    participant API_StudyType
-    participant API_GenerateStudyType
+    participant API_StudyTypeGet "/api/studyType (GET)"
+    participant API_GenerateStudyTypePost "/api/generate-studyType-content (POST)"
     participant AI_Gemini
     participant DB_StudyTypeTable
     participant DB_NotesTable
@@ -164,36 +163,38 @@ sequenceDiagram
 
     alt Generate/View Flashcards
         User->>Frontend_CoursePage: Clicks "Generate Flashcards" (selects count)
-        Frontend_CoursePage->>API_GenerateStudyType: POST /api/generate-studyType-content (courseId, studyType='flashcards', count, etc.)
-        API_GenerateStudyType->>DB_NotesTable: Fetch course content (chapters for prompt)
-        API_GenerateStudyType->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='flashcards', courseId)
+        Frontend_CoursePage->>API_GenerateStudyTypePost: POST (courseId, studyType='flashcards', count, etc.)
+        API_GenerateStudyTypePost->>DB_NotesTable: Fetch course content (chapters for prompt)
+        API_GenerateStudyTypePost->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='flashcards', courseId)
         Inngest_BackgroundJobs->>AI_Gemini: Generate flashcard JSON from prompt
         AI_Gemini-->>Inngest_BackgroundJobs: Flashcard JSON
-        Inngest_BackgroundJobs->>DB_StudyTypeTable: Store flashcard JSON (flashcardContent column)
+        Inngest_BackgroundJobs->>DB_StudyTypeTable: Upsert flashcard JSON (updates flashcardContent WHERE courseId=PK, or inserts new row if no courseId entry)
         Inngest_BackgroundJobs->>DB_NotesTable: Update notes.flashcardsGenerated = true
         Frontend_CoursePage->>User: Shows "Generating..." (polling or context update)
         User->>Frontend_CoursePage: Navigates to Flashcards tab later
-        Frontend_CoursePage->>API_StudyType: GET /api/studyType?courseId=...&studyType=flashcards
-        API_StudyType->>DB_StudyTypeTable: Fetch flashcard JSON
-        DB_StudyTypeTable-->>API_StudyType: Return flashcard JSON
-        API_StudyType-->>Frontend_CoursePage: Display flashcards
+        Frontend_CoursePage->>API_StudyTypeGet: GET /api/studyType?courseId=...&studyType=flashcards
+        API_StudyTypeGet->>DB_StudyTypeTable: Fetch row by courseId
+        DB_StudyTypeTable-->>API_StudyTypeGet: Return single row (or null)
+        API_StudyTypeGet-->>Frontend_CoursePage: Return { studyType: { courseId: ..., flashcardContent: ... } } (or null if no row/content)
+        Frontend_CoursePage->>User: Display flashcards
     end
 
     alt Generate/View Quiz
         User->>Frontend_CoursePage: Clicks "Generate Quiz" (selects question count)
-        Frontend_CoursePage->>API_GenerateStudyType: POST /api/generate-studyType-content (courseId, studyType='quiz', count, etc.)
-        API_GenerateStudyType->>DB_NotesTable: Fetch course content (chapters for prompt)
-        API_GenerateStudyType->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='quiz', courseId)
+        Frontend_CoursePage->>API_GenerateStudyTypePost: POST (courseId, studyType='quiz', count, etc.)
+        API_GenerateStudyTypePost->>DB_NotesTable: Fetch course content (chapters for prompt)
+        API_GenerateStudyTypePost->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='quiz', courseId)
         Inngest_BackgroundJobs->>AI_Gemini: Generate quiz JSON from prompt
         AI_Gemini-->>Inngest_BackgroundJobs: Quiz JSON
-        Inngest_BackgroundJobs->>DB_StudyTypeTable: Store quiz JSON (quizContent column)
+        Inngest_BackgroundJobs->>DB_StudyTypeTable: Upsert quiz JSON (updates quizContent WHERE courseId=PK, or inserts new row if no courseId entry)
         Inngest_BackgroundJobs->>DB_NotesTable: Update notes.quizGenerated = true
         Frontend_CoursePage->>User: Shows "Generating..." (polling or context update)
         User->>Frontend_CoursePage: Navigates to Quiz tab later
-        Frontend_CoursePage->>API_StudyType: GET /api/studyType?courseId=...&studyType=quiz
-        API_StudyType->>DB_StudyTypeTable: Fetch quiz JSON
-        DB_StudyTypeTable-->>API_StudyType: Return quiz JSON
-        API_StudyType-->>Frontend_CoursePage: Display quiz
+        Frontend_CoursePage->>API_StudyTypeGet: GET /api/studyType?courseId=...&studyType=quiz
+        API_StudyTypeGet->>DB_StudyTypeTable: Fetch row by courseId
+        DB_StudyTypeTable-->>API_StudyTypeGet: Return single row (or null)
+        API_StudyTypeGet-->>Frontend_CoursePage: Return { studyType: { courseId: ..., quizContent: ... } } (or null if no row/content)
+        Frontend_CoursePage->>User: Display quiz
     end
 ```
 
@@ -201,12 +202,14 @@ sequenceDiagram
 
 ### Frontend
 
-- Next.js (version specific if known, e.g., 14.x)
-- React (version specific if known, e.g., 18.x)
+- Next.js (e.g., 14.x)
+- React (e.g., 18.x)
 - TailwindCSS
 - Shadcn/UI (Radix UI & Tailwind CSS)
 - Framer Motion
 - Lucide React Icons
+- React Markdown (for rendering Markdown in quizzes)
+- Highlight.js (for syntax highlighting in notes & quizzes)
 
 ### Backend
 
@@ -238,9 +241,15 @@ sequenceDiagram
    cp .env.sample .env
    ```
    Fill in the required values in your `.env` file.
-4. Initialize the database (if using Drizzle Kit for migrations):
+4. Initialize or update the database schema:
+   If using Drizzle Kit migrations (recommended):
    ```bash
-   npm run db:push # Or your specific migration command
+   npx drizzle-kit generate # Generate migration if schema changed
+   npx drizzle-kit migrate  # Apply migrations
+   ```
+   Or, for direct push (use with caution, especially on existing data):
+   ```bash
+   npx drizzle-kit push
    ```
 5. Run the development server:
    ```bash
@@ -329,24 +338,3 @@ studymate-ai/
 ├── README.md                 # This file
 └── tailwind.config.mjs       # Tailwind CSS configuration
 ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature/your-feature-name`).
-6. Open a Pull Request.
-
-Please ensure your code adheres to the existing style and that all tests pass.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE.md file for details (if one exists, otherwise specify).
-
----
-
-✨ Happy Studying with StudyMate AI! ✨

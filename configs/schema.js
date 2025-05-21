@@ -37,9 +37,7 @@ export const chapterContentTable = pgTable("chapterContent", {
 });
 
 export const studyTypeTable = pgTable("studyType", {
-  id: varchar().primaryKey(),
-  courseId: varchar().notNull(),
+  courseId: varchar().primaryKey(),
   flashcardContent: json(),
   quizContent: json(),
-  studyType: varchar().notNull(),
 });

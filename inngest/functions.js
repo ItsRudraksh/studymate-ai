@@ -123,39 +123,41 @@ export const generateStudyType = inngest.createFunction(
   async ({ event, step }) => {
     const { studyType, prompt, courseId } = event.data;
 
-    let columnToUpdate;
+    let valuesToUpsert = { courseId };
     let aiGeneratedContent;
 
     if (studyType === "flashcards") {
-      columnToUpdate = "flashcardContent";
       aiGeneratedContent = await step.run("Generating Flashcards", async () => {
         const res = await genFlashCards.sendMessage(prompt);
         const aiRes = JSON.parse(res.response.text());
         return aiRes;
       });
+      valuesToUpsert.flashcardContent = aiGeneratedContent;
     } else if (studyType === "quiz") {
-      columnToUpdate = "quizContent";
       aiGeneratedContent = await step.run("Generating Quiz", async () => {
         const res = await genQuizContent.sendMessage(prompt);
         const aiRes = JSON.parse(res.response.text());
         return aiRes;
       });
+      valuesToUpsert.quizContent = aiGeneratedContent;
     } else {
-      // Handle other study types or throw an error
       console.error(`Unsupported study type: ${studyType}`);
       return "Unsupported study type";
     }
 
     if (aiGeneratedContent) {
-      await step.run("Updating Study Type", async () => {
+      await step.run("Upserting Study Type Content", async () => {
         await db
-          .update(studyTypeTable)
-          .set({
-            [columnToUpdate]: aiGeneratedContent,
-          })
-          .where(eq(studyTypeTable.courseId, courseId))
-          .where(eq(studyTypeTable.studyType, studyType)); // Ensure we update the correct record
-        return "Study Type Updated Successfully";
+          .insert(studyTypeTable)
+          .values(valuesToUpsert)
+          .onConflictDoUpdate({
+            target: studyTypeTable.courseId, // Conflict on courseId
+            set:
+              studyType === "flashcards"
+                ? { flashcardContent: aiGeneratedContent }
+                : { quizContent: aiGeneratedContent }, // Set the specific column
+          });
+        return "Study Type Content Upserted Successfully";
       });
     }
 
