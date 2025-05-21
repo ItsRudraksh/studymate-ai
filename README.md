@@ -82,6 +82,8 @@ graph TD
 
 ```mermaid
 erDiagram
+    direction LR
+
     users ||--o{ notes : creates
     notes ||--o{ chapterContent : "contains chapters"
     notes }|--|| studyTypeTable : "has one entry for"
