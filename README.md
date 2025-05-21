@@ -25,6 +25,7 @@ StudyMate AI is an AI-powered study material generation platform that helps user
   - Categorize content (Exam, Job, Coding, Other)
   - Set difficulty levels (Easy, Medium, Hard)
   - Real-time status updates
+  - `quizGenerated` flag to track quiz availability
 
 - **Dashboard**
 
@@ -32,12 +33,12 @@ StudyMate AI is an AI-powered study material generation platform that helps user
   - Course listing and management
   - Progress tracking
   - Real-time status updates
-  - **Search and Filtering** (NEW)
+  - **Search and Filtering**
     - Filter courses by category (All, Coding, Exam, Job, Other)
     - Search courses by title and description
     - Real-time filtering with result count indicators
 
-- **Study Materials** (NEW)
+- **Study Materials**
   - **Notes**
     - Chapter-by-chapter structured content
     - Desktop and mobile-friendly sidebar navigation
@@ -48,6 +49,14 @@ StudyMate AI is an AI-powered study material generation platform that helps user
     - Circular navigation (loop from last card to first)
     - Motion effects and transitions
     - Mobile responsive design
+  - **Interactive Quizzes** (NEW)
+    - Customizable number of question generation (5, 10, 15, 20, 25)
+    - Multiple-choice questions
+    - Instant feedback with correct answers and explanations
+    - Score calculation
+    - Option to retake quiz
+    - "Clear Answer" functionality for individual questions
+    - Responsive design for various screen sizes
 
 ## 🏗️ Architecture
 
@@ -62,8 +71,10 @@ graph TD
     C --> F[Inngest Background Jobs]
     F --> G[Chapter Content Generation]
     F --> H[Flashcards Generation]
+    F --> I[Quiz Generation]
     G --> D
     H --> D
+    I --> D
 ```
 
 ### Database Schema
@@ -72,35 +83,42 @@ graph TD
 erDiagram
     users ||--o{ notes : creates
     notes ||--o{ chapterContent : contains
-    notes ||--o{ studyType : has
+    notes ||--o{ studyTypeTable : "has study materials"
+
     users {
-        string id PK
-        string name
-        string email
-        boolean isMember
+        string id PK "User ID (from Clerk)"
+        string name "User's full name"
+        string email "User's email address"
+        boolean isMember "Subscription status (future use)"
     }
+
     notes {
-        string id PK
-        string courseId
-        string courseType
-        string topic
-        string difficulty
-        json courseContent
-        string createdBy
-        string status
-        boolean flashcardsGenerated
+        string id PK "Unique Course ID (UUID)"
+        string courseId "Duplicate of ID for clarity, or actual foreign key if structure differs"
+        string courseType "Category (Exam, Job, Coding, Other)"
+        string topic "Main topic/title of the course"
+        string difficulty "Difficulty level (Easy, Medium, Hard)"
+        json courseContent "Overall course structure, chapters, outline"
+        string createdBy "User ID of the creator"
+        string status "Generation status (e.g., Pending, Generating, Completed)"
+        boolean flashcardsGenerated "Flag if flashcards are ready"
+        boolean quizGenerated "Flag if quiz is ready"
     }
+
     chapterContent {
-        string id PK
-        string courseId
-        integer chapterId
-        text chapterContent
+        string id PK "Unique ID for chapter content"
+        string courseId FK "Links to notes table"
+        integer chapterId "Sequential chapter number"
+        text chapterContent "Detailed content of the chapter"
+        string title "Chapter Title"
     }
-    studyType {
-        string id PK
-        string courseId
-        string type
-        json content
+
+    studyTypeTable {
+        string id PK "Unique ID for study material instance (UUID)"
+        string courseId FK "Links to notes table (course)"
+        string studyType FK "Type of study material (e.g., 'flashcards', 'quiz')"
+        json flashcardContent "JSON content for flashcards"
+        json quizContent "JSON content for quizzes"
     }
 ```
 
@@ -115,16 +133,17 @@ sequenceDiagram
     participant DB
     participant Background
 
-    User->>Frontend: Create Course
+    User->>Frontend: Create Course (topic, type, difficulty)
     Frontend->>API: Submit Course Details
-    API->>AI: Generate Course Outline
+    API->>AI: Generate Course Outline (chapters, titles)
     AI-->>API: Return Course Structure
-    API->>DB: Store Course Metadata
-    API->>Background: Trigger Content Generation
-    Background->>AI: Generate Chapter Content
-    Background->>DB: Store Chapter Content
-    Background-->>Frontend: Update Status
-    Frontend-->>User: Show Progress
+    API->>DB: Store Course Metadata (notes table: topic, status='Pending', etc.)
+    API->>Background: Trigger Full Content Generation (courseId, chapters list)
+    Background->>AI: Generate Content for Each Chapter
+    Background->>DB: Store Chapter Content (chapterContent table)
+    Background->>API: (Optional) Update chapter generation status
+    API->>DB: Update Course Status (notes table: status='Completed')
+    Frontend-->>User: Show Progress & Completion
 ```
 
 ### Study Materials Flow
@@ -132,34 +151,49 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant User
-    participant Dashboard
-    participant Course
-    participant API
-    participant AI
-    participant DB
+    participant Frontend_CoursePage
+    participant API_StudyType
+    participant API_GenerateStudyType
+    participant AI_Gemini
+    participant DB_StudyTypeTable
+    participant DB_NotesTable
+    participant Inngest_BackgroundJobs
 
-    User->>Dashboard: Browse Courses
-    Dashboard->>User: Filtered & Searchable Course List
-    User->>Course: Select Course
-    Course->>User: Display Study Options
+    User->>Frontend_CoursePage: Views a course
+    Frontend_CoursePage->>User: Displays options (View Notes, Flashcards, Quiz)
 
-    alt Generate Notes
-        Course->>API: Request Notes Generation
-        API->>AI: Generate Chapter Content
-        AI-->>API: Return Generated Content
-        API->>DB: Store Content
-        API-->>Course: Update Status
-        Course-->>User: Display Notes
+    alt Generate/View Flashcards
+        User->>Frontend_CoursePage: Clicks "Generate Flashcards" (selects count)
+        Frontend_CoursePage->>API_GenerateStudyType: POST /api/generate-studyType-content (courseId, studyType='flashcards', count, etc.)
+        API_GenerateStudyType->>DB_NotesTable: Fetch course content (chapters for prompt)
+        API_GenerateStudyType->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='flashcards', courseId)
+        Inngest_BackgroundJobs->>AI_Gemini: Generate flashcard JSON from prompt
+        AI_Gemini-->>Inngest_BackgroundJobs: Flashcard JSON
+        Inngest_BackgroundJobs->>DB_StudyTypeTable: Store flashcard JSON (flashcardContent column)
+        Inngest_BackgroundJobs->>DB_NotesTable: Update notes.flashcardsGenerated = true
+        Frontend_CoursePage->>User: Shows "Generating..." (polling or context update)
+        User->>Frontend_CoursePage: Navigates to Flashcards tab later
+        Frontend_CoursePage->>API_StudyType: GET /api/studyType?courseId=...&studyType=flashcards
+        API_StudyType->>DB_StudyTypeTable: Fetch flashcard JSON
+        DB_StudyTypeTable-->>API_StudyType: Return flashcard JSON
+        API_StudyType-->>Frontend_CoursePage: Display flashcards
     end
 
-    alt Generate Flashcards
-        User->>Course: Select Flashcard Count
-        Course->>API: Request Flashcards Generation
-        API->>AI: Generate Flashcards
-        AI-->>API: Return Generated Flashcards
-        API->>DB: Store Flashcards
-        API-->>Course: Update Status
-        Course-->>User: Display Interactive Flashcards
+    alt Generate/View Quiz
+        User->>Frontend_CoursePage: Clicks "Generate Quiz" (selects question count)
+        Frontend_CoursePage->>API_GenerateStudyType: POST /api/generate-studyType-content (courseId, studyType='quiz', count, etc.)
+        API_GenerateStudyType->>DB_NotesTable: Fetch course content (chapters for prompt)
+        API_GenerateStudyType->>Inngest_BackgroundJobs: Send event "generate.study.type.content" (prompt, studyType='quiz', courseId)
+        Inngest_BackgroundJobs->>AI_Gemini: Generate quiz JSON from prompt
+        AI_Gemini-->>Inngest_BackgroundJobs: Quiz JSON
+        Inngest_BackgroundJobs->>DB_StudyTypeTable: Store quiz JSON (quizContent column)
+        Inngest_BackgroundJobs->>DB_NotesTable: Update notes.quizGenerated = true
+        Frontend_CoursePage->>User: Shows "Generating..." (polling or context update)
+        User->>Frontend_CoursePage: Navigates to Quiz tab later
+        Frontend_CoursePage->>API_StudyType: GET /api/studyType?courseId=...&studyType=quiz
+        API_StudyType->>DB_StudyTypeTable: Fetch quiz JSON
+        DB_StudyTypeTable-->>API_StudyType: Return quiz JSON
+        API_StudyType-->>Frontend_CoursePage: Display quiz
     end
 ```
 
@@ -167,12 +201,12 @@ sequenceDiagram
 
 ### Frontend
 
-- Next.js 15.1.7
-- React 19
+- Next.js (version specific if known, e.g., 14.x)
+- React (version specific if known, e.g., 18.x)
 - TailwindCSS
-- Radix UI Components
+- Shadcn/UI (Radix UI & Tailwind CSS)
 - Framer Motion
-- 3D Transformations and Animations
+- Lucide React Icons
 
 ### Backend
 
@@ -180,79 +214,139 @@ sequenceDiagram
 - PostgreSQL (NeonDB)
 - Drizzle ORM
 - Clerk Authentication
-- Google Generative AI (Gemini)
-- Inngest Background Processing
+- Google Generative AI (Gemini Pro)
+- Inngest (Background Job Processing)
 
 ## 🚀 Getting Started
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/studymate-ai.git
+   cd studymate-ai
+   ```
 2. Install dependencies:
-
-```bash
-npm install
-```
-
+   ```bash
+   npm install
+   # or
+   # yarn install
+   # or
+   # pnpm install
+   ```
 3. Set up environment variables:
-
-```bash
-cp .env.sample .env
-# Fill in your environment variables
-```
-
-4. Run the development server:
-
-```bash
-npm run dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) with your browser
+   Create a `.env` file by copying `.env.sample`:
+   ```bash
+   cp .env.sample .env
+   ```
+   Fill in the required values in your `.env` file.
+4. Initialize the database (if using Drizzle Kit for migrations):
+   ```bash
+   npm run db:push # Or your specific migration command
+   ```
+5. Run the development server:
+   ```bash
+   npm run dev
+   ```
+6. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 ## 📝 Environment Variables
 
-Required environment variables:
+Ensure the following environment variables are set in your `.env` file:
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `CLERK_SECRET_KEY`: Clerk authentication secret
-- `GOOGLE_API_KEY`: Google Gemini AI API key
-- `INNGEST_EVENT_KEY`: Inngest background job key
+- `DATABASE_URL`: Your PostgreSQL connection string (e.g., from NeonDB).
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key.
+- `CLERK_SECRET_KEY`: Your Clerk secret key.
+- `GOOGLE_API_KEY`: Your Google Generative AI (Gemini) API key.
+- `INNGEST_EVENT_KEY`: Your Inngest event key (for sending events).
+- `INNGEST_SIGNING_KEY`: Your Inngest signing key (for verifying webhooks, if applicable).
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard`
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard`
 
 ## 🔒 Security
 
-- Authentication handled by Clerk
-- Secure API routes
-- Environment variable protection
-- Database connection security
+- Authentication and user management handled by Clerk.
+- Secure API routes with appropriate request validation.
+- Environment variables managed via `.env` file (ensure it's in `.gitignore`).
+- Database connection security (SSL/TLS recommended with NeonDB).
+- Input sanitization and validation to prevent common web vulnerabilities.
 
 ## 📦 Project Structure
 
 ```
 studymate-ai/
 ├── app/
-│   ├── api/                # API routes
-│   ├── dashboard/          # Dashboard pages
-│   │   └── _components/    # Dashboard components
-│   ├── create/             # Course creation
-│   ├── course/             # Course pages
-│   │   ├── [courseId]/     # Dynamic course routes
-│   │   │   ├── notes/      # Notes pages and components
-│   │   │   └── flashcards/ # Flashcards pages and components
-│   │   └── _components/    # Shared course components
-│   └── (auth)/             # Authentication pages
-├── components/             # Reusable components
-├── configs/                # Configuration files
-├── hooks/                  # Custom React hooks
-├── lib/                    # Utility functions
-└── styles/                 # Global styles
+│   ├── (auth)/               # Authentication pages (sign-in, sign-up)
+│   │   └── [[...sign-in]]/
+│   │   └── [[...sign-up]]/
+│   ├── api/                  # API routes
+│   │   ├── courses/
+│   │   ├── create-user/
+│   │   ├── generate-course-outline/
+│   │   ├── generate-studyType-content/
+│   │   ├── inngest/          # Inngest webhook handler
+│   │   ├── notes/
+│   │   └── studyType/
+│   ├── course/               # Course-specific pages
+│   │   ├── [courseId]/       # Dynamic route for a specific course
+│   │   │   ├── flashcards/   # Flashcards page and components
+│   │   │   │   └── page.jsx
+│   │   │   │   └── layout.jsx
+│   │   │   ├── notes/        # Notes page and components
+│   │   │   │   └── _components/
+│   │   │   │   └── page.jsx
+│   │   │   │   └── layout.jsx
+│   │   │   ├── quiz/         # Quiz page and components (NEW)
+│   │   │   │   └── page.jsx
+│   │   │   │   └── layout.jsx
+│   │   │   └── layout.jsx    # Layout for a specific course
+│   │   └── _components/      # Shared components for course pages (e.g., StudyMaterial.jsx)
+│   ├── create/               # Page for creating new courses
+│   │   └── page.jsx
+│   ├── dashboard/            # User dashboard
+│   │   └── _components/
+│   │   └── page.jsx
+│   ├── context/              # React Context providers (e.g., CourseContext.jsx)
+│   ├── layout.jsx            # Root layout
+│   └── page.jsx              # Root page (homepage)
+├── components/               # Reusable UI components (Shadcn/UI based)
+│   └── ui/                   # Generated Shadcn UI components
+├── configs/                  # Configuration files (db.js, gemini.js, schema.js)
+├── hooks/                    # Custom React hooks (e.g., use-toast.js)
+├── inngest/                  # Inngest client and function definitions
+├── lib/                      # Utility functions and libraries
+├── public/                   # Static assets
+├── .env                      # Environment variables (Gitignored)
+├── .env.sample               # Sample environment variables
+├── .eslintrc.json            # ESLint configuration
+├── .gitignore                # Git ignore file
+├── components.json           # Shadcn/UI configuration
+├── drizzle.config.js         # Drizzle ORM configuration
+├── middleware.js             # Next.js middleware (e.g., for Clerk auth)
+├── next.config.mjs           # Next.js configuration
+├── package.json              # Project dependencies and scripts
+├── postcss.config.mjs        # PostCSS configuration
+├── README.md                 # This file
+└── tailwind.config.mjs       # Tailwind CSS configuration
 ```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+Contributions are welcome! Please follow these steps:
 
-## 📄 License
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature-name`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature/your-feature-name`).
+6. Open a Pull Request.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Please ensure your code adheres to the existing style and that all tests pass.
+
+## 📜 License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details (if one exists, otherwise specify).
+
+---
+
+✨ Happy Studying with StudyMate AI! ✨

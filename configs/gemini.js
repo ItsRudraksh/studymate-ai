@@ -151,3 +151,429 @@ export const genFlashCards = model.startChat({
     },
   ],
 });
+
+export const genQuizContent = model.startChat({
+  generationConfig: {
+    temperature: 1,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+  },
+  history: [
+    {
+      role: "user",
+      parts: [
+        {
+          text: `Task:  
+Generate up to 10 multiple-choice questions (MCQs) focused on the main topic: Intermediate C++ File Handling.  
+Use the following subtopics for additional context: [
+    {
+      "chapterNumber": 1,
+      "chapterTitle": "Introduction to File Handling in C++",
+      "chapterSummary": "This chapter provides an overview of file handling in C++. It covers the basics of file streams, different file types, and the necessary header files for file I/O operations. It emphasizes the importance of file handling for data persistence and storage.",
+      "topics": [
+        {
+          "topicTitle": "Fundamentals of File Handling",
+          "subtopics": [
+            "What is File Handling?",
+            "Importance of File Handling (Data Persistence, Storage, and Retrieval)",
+            "File Types: Text Files vs. Binary Files",
+            "File Streams: \`ifstream\` (Input), \`ofstream\` (Output), \`fstream\` (Input/Output)"
+          ]
+        },
+        {
+          "topicTitle": "Header Files for File I/O",
+          "subtopics": [
+            "\`fstream\` Header: Including the necessary file streams",
+            "Standard Library Namespace (\`std\`)",
+            "Other relevant headers if required for advanced operations"
+          ]
+        },
+        {
+          "topicTitle": "Opening and Closing Files",
+          "subtopics": [
+            "Opening Files using Constructors of \`ifstream\`, \`ofstream\`, and \`fstream\`",
+            "File Modes: \`ios::in\`, \`ios::out\`, \`ios::app\`, \`ios::trunc\`, \`ios::binary\`",
+            "Combining File Modes (e.g., \`ios::out | ios::binary\`)",
+            "Closing Files using \`close()\` method"
+          ]
+        },
+        {
+          "topicTitle": "Checking File Status",
+          "subtopics": [
+            "\`is_open()\`: Checking if a file is successfully opened",
+            "\`fail()\`: Checking for general errors during file operations",
+            "\`bad()\`: Checking for severe errors (e.g., hardware failure)",
+            "\`eof()\`: Checking for end-of-file condition"
+          ]
+        },
+        {
+          "topicTitle": "Simple Example: Writing to a Text File",
+          "subtopics": [
+            "Creating an \`ofstream\` object",
+            "Opening a file in \`ios::out\` mode",
+            "Writing data to the file using the \`<<\` operator",
+            "Closing the file"
+          ]
+        }
+      ]
+    },
+    {
+      "chapterNumber": 2,
+      "chapterTitle": "Reading from and Writing to Text Files",
+      "chapterSummary": "This chapter focuses on reading data from and writing data to text files using different techniques. It covers character-by-character, line-by-line, and formatted I/O, providing examples for each method.",
+      "topics": [
+        {
+          "topicTitle": "Writing to Text Files",
+          "subtopics": [
+            "Using the \`<<\` Operator for Formatted Output",
+            "Writing Characters: \`put()\` method",
+            "Writing Lines: \`write()\` method (with length specification)",
+            "Formatting Output (using manipulators like \`setw\`, \`setprecision\`, \`fixed\`)",
+            "Writing Multiple Data Types to a File"
+          ]
+        },
+        {
+          "topicTitle": "Reading from Text Files",
+          "subtopics": [
+            "Using the \`>>\` Operator for Formatted Input",
+            "Reading Characters: \`get()\` method",
+            "Reading Lines: \`getline()\` function",
+            "Handling Whitespace (using \`ws\` manipulator)",
+            "Reading Multiple Data Types from a File"
+          ]
+        },
+        {
+          "topicTitle": "Character-by-Character I/O",
+          "subtopics": [
+            "Reading a single character using \`get()\`",
+            "Writing a single character using \`put()\`",
+            "Handling end-of-line characters",
+            "Practical use cases for character-by-character processing"
+          ]
+        },
+        {
+          "topicTitle": "Line-by-Line I/O",
+          "subtopics": [
+            "Reading a line using \`getline()\`",
+            "Writing a line using \`write()\` or \`<<\` with \`endl\`",
+            "Handling long lines and buffer overflow",
+            "Practical use cases for line-by-line processing (e.g., configuration files)"
+          ]
+        },
+        {
+          "topicTitle": "Formatted I/O",
+          "subtopics": [
+            "Using stream manipulators for formatting (e.g., \`setw\`, \`setprecision\`, \`fixed\`, \`left\`, \`right\`)",
+            "Reading and writing data in specific formats",
+            "Example: Storing and retrieving tabular data in a text file"
+          ]
+        },
+        {
+          "topicTitle": "Example: Reading and Processing a CSV File",
+          "subtopics": [
+            "Reading data from a comma-separated value (CSV) file",
+            "Parsing each line into individual fields",
+            "Handling different data types in CSV file",
+            "Error handling for malformed CSV entries"
+          ]
+        }
+      ]
+    },
+    {
+      "chapterNumber": 3,
+      "chapterTitle": "Working with Binary Files",
+      "chapterSummary": "This chapter explores binary file handling, focusing on reading and writing raw bytes of data. It covers the advantages of binary files, techniques for reading and writing structures and objects, and considerations for platform independence.",
+      "topics": [
+        {
+          "topicTitle": "Introduction to Binary Files",
+          "subtopics": [
+            "What are Binary Files?",
+            "Differences between Text Files and Binary Files",
+            "Advantages of Binary Files (Efficiency, Storage Space, Data Integrity)",
+            "Using \`ios::binary\` Mode"
+          ]
+        },
+        {
+          "topicTitle": "Reading from Binary Files",
+          "subtopics": [
+            "Using \`read()\` method (specifying the number of bytes to read)",
+            "Reading Raw Bytes",
+            "Reading Structures and Objects",
+            "Handling End-of-File (EOF)"
+          ]
+        },
+        {
+          "topicTitle": "Writing to Binary Files",
+          "subtopics": [
+            "Using \`write()\` method (specifying the number of bytes to write)",
+            "Writing Raw Bytes",
+            "Writing Structures and Objects",
+            "Padding Structures for Proper Alignment"
+          ]
+        },
+        {
+          "topicTitle": "Reading and Writing Structures/Objects",
+          "subtopics": [
+            "Casting Pointers to \`char*\` for \`read()\` and \`write()\`",
+            "Ensuring Proper Alignment of Data Structures",
+            "Considerations for Platform Independence (Endianness)",
+            "Using \`sizeof()\` to Determine Object Size"
+          ]
+        },
+        {
+          "topicTitle": "Example: Storing and Retrieving a Student Record",
+          "subtopics": [
+            "Defining a \`Student\` structure (name, ID, GPA)",
+            "Writing a \`Student\` object to a binary file",
+            "Reading a \`Student\` object from a binary file",
+            "Error handling for file I/O operations"
+          ]
+        }
+      ]
+    },
+    {
+      "chapterNumber": 4,
+      "chapterTitle": "File Positioning and Random Access",
+      "chapterSummary": "This chapter covers file positioning techniques, allowing you to move the file pointer to specific locations for reading or writing. It introduces the \`seekg()\` and \`seekp()\` methods and demonstrates how to implement random access file operations.",
+      "topics": [
+        {
+          "topicTitle": "Understanding File Pointers",
+          "subtopics": [
+            "What are File Pointers?",
+            "Input File Pointer (get pointer)",
+            "Output File Pointer (put pointer)",
+            "Default Positions of File Pointers"
+          ]
+        },
+        {
+          "topicTitle": "\`seekg()\` and \`seekp()\` Methods",
+          "subtopics": [
+            "\`seekg()\`: Positioning the input file pointer (for reading)",
+            "\`seekp()\`: Positioning the output file pointer (for writing)",
+            "Syntax: \`seekg(offset, origin)\` and \`seekp(offset, origin)\`",
+            "Offset: Number of bytes to move the pointer",
+            "Origin: \`ios::beg\` (beginning), \`ios::cur\` (current), \`ios::end\` (end)"
+          ]
+        },
+        {
+          "topicTitle": "\`tellg()\` and \`tellp()\` Methods",
+          "subtopics": [
+            "\`tellg()\`: Returning the current position of the input file pointer",
+            "\`tellp()\`: Returning the current position of the output file pointer",
+            "Use cases for \`tellg()\` and \`tellp()\` (e.g., saving file positions)"
+          ]
+        },
+        {
+          "topicTitle": "Random Access File Operations",
+          "subtopics": [
+            "Reading Data from Specific Locations in a File",
+            "Writing Data to Specific Locations in a File",
+            "Updating Records in a File",
+            "Implementing a Simple Indexing System"
+          ]
+        },
+        {
+          "topicTitle": "Example: Reading a Specific Record from a File",
+          "subtopics": [
+            "Determining the offset for a specific record",
+            "Using \`seekg()\` to move the file pointer to the record's location",
+            "Reading the record's data",
+            "Error handling for invalid record numbers"
+          ]
+        }
+      ]
+    },
+    {
+      "chapterNumber": 5,
+      "chapterTitle": "Error Handling and Exception Safety",
+      "chapterSummary": "This chapter focuses on robust error handling techniques for file I/O operations. It covers checking file status flags, handling exceptions, and ensuring that resources (e.g., file streams) are properly released, even in the presence of errors.",
+      "topics": [
+        {
+          "topicTitle": "File Status Flags",
+          "subtopics": [
+            "\`fail()\`: Checking for general errors during file operations",
+            "\`bad()\`: Checking for severe errors (e.g., hardware failure)",
+            "\`eof()\`: Checking for end-of-file condition",
+            "\`good()\`: Checking if the file stream is in a good state",
+            "Clearing Error Flags using \`clear()\`"
+          ]
+        },
+        {
+          "topicTitle": "Exception Handling with \`try-catch\` Blocks",
+          "subtopics": [
+            "Using \`try-catch\` blocks to handle file I/O exceptions",
+            "Exception Types: \`ios_base::failure\` (thrown when a file operation fails)",
+            "Catching Specific Exceptions vs. Catching a General Exception",
+            "Rethrowing Exceptions"
+          ]
+        },
+        {
+          "topicTitle": "Resource Management (RAII)",
+          "subtopics": [
+            "What is Resource Acquisition Is Initialization (RAII)?",
+            "Using RAII to ensure that file streams are closed properly",
+            "Creating custom RAII wrappers for file streams (optional)",
+            "Preventing resource leaks"
+          ]
+        },
+        {
+          "topicTitle": "Exception Safety",
+          "subtopics": [
+            "Strong Exception Safety Guarantee (Operations either succeed completely or have no effect)",
+            "Basic Exception Safety Guarantee (No resources are leaked, and the object is in a usable state)",
+            "No-Throw Guarantee (Operations never throw exceptions)",
+            "Writing Exception-Safe File I/O Code"
+          ]
+        },
+        {
+          "topicTitle": "Example: Reading a File with Robust Error Handling",
+          "subtopics": [
+            "Opening a file in a \`try\` block",
+            "Reading data from the file",
+            "Handling potential exceptions (e.g., \`ios_base::failure\`) in a \`catch\` block",
+            "Ensuring that the file stream is closed in a \`finally\` block (or using RAII)",
+            "Providing informative error messages"
+          ]
+        }
+      ]
+    }
+  ].  
+
+Requirements:  
+- Match the overall complexity level: medium (easy | medium | hard).  
+- Tailor the style and content for the intended use case: coding (coding | job | exam | general).  
+- Always create exactly 4 options for each question.  
+- Include questions that involve code snippets or code-based logic where appropriate (especially for coding use cases).  
+- Prioritize meaningful, non-repetitive, and high-quality questions.  
+- If fewer than <number> MCQs are feasible, output only as many as meet the quality standards.
+
+Output Format (JSON Array):
+[
+  {
+    "question": "string",
+    "options": ["string", "string", "string", "string"],
+    "correctAnswer": "string",
+    "correctOption": "A" | "B" | "C" | "D",
+    "explanation": "string"
+  },
+  ...
+]
+
+Notes:  
+- correctAnswer must exactly match one of the options.  
+- correctOption must indicate the corresponding letter ("A", "B", "C", or "D") for the correct answer.  
+- explanation should briefly justify why the selected answer is correct (1–2 sentences maximum).  
+- For coding MCQs, format short code snippets inline (e.g., \`print('Hello')\`) or use fenced code blocks (\`\`\`python ... \`\`\`) if multiline code is needed.  
+- Output only the valid JSON array — no extra commentary or text.`,
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [
+        {
+          text: `[
+  {
+    "question": "Which of the following file modes, when used with \`ofstream\`, will delete the file's content if it exists?",
+    "options": [
+      "ios::app",
+      "ios::in",
+      "ios::trunc",
+      "ios::binary"
+    ],
+    "correctAnswer": "ios::trunc",
+    "correctOption": "C",
+    "explanation": "\`ios::trunc\` truncates the file to zero length if it exists, effectively deleting its contents when opening with \`ofstream\`."
+  },
+  {
+    "question": "What is the primary difference between text files and binary files in C++ file handling?",
+    "options": [
+      "Text files are more efficient for storing large amounts of data.",
+      "Binary files store data as a sequence of characters, while text files store data in raw byte format.",
+      "Text files store data as formatted characters, while binary files store data in raw byte format.",
+      "Binary files can only be used for storing images and videos."
+    ],
+    "correctAnswer": "Text files store data as formatted characters, while binary files store data in raw byte format.",
+    "correctOption": "C",
+    "explanation": "Text files interpret data as characters based on encoding, while binary files store the raw byte representation of data, making them suitable for storing any type of data."
+  },
+  {
+    "question": "Which method is used to move the reading file pointer to a specific location in a file?",
+    "options": [
+      "seekg()",
+      "seekp()",
+      "tellg()",
+      "tellp()"
+    ],
+    "correctAnswer": "seekg()",
+    "correctOption": "A",
+    "explanation": "\`seekg()\` is used to position the 'get' pointer (input pointer) to a specific location within a file for reading."
+  },
+  {
+    "question": "What is the purpose of the \`eof()\` function in C++ file handling?",
+    "options": [
+      "To check if the file is open.",
+      "To check if the file stream is in a good state.",
+      "To check for general errors during file operations.",
+      "To check for the end-of-file condition."
+    ],
+    "correctAnswer": "To check for the end-of-file condition.",
+    "correctOption": "D",
+    "explanation": "\`eof()\` returns true if the end-of-file indicator has been set, meaning the end of the file has been reached during a read operation."
+  },
+  {
+    "question": "What does RAII stand for in the context of C++ file handling and resource management?",
+    "options": [
+      "Resource Allocation Is Initialization",
+      "Resource Acquisition Is Initialization",
+      "Resource Allocation Is Integration",
+      "Resource Acquisition Is Integration"
+    ],
+    "correctAnswer": "Resource Acquisition Is Initialization",
+    "correctOption": "B",
+    "explanation": "RAII (Resource Acquisition Is Initialization) is a programming idiom used in C++ to ensure resources are properly released when an object goes out of scope."
+  },
+  {
+    "question": "Which of the following is the correct way to open a file named 'data.txt' in binary mode for writing using \`ofstream\`?",
+    "options": [
+      "ofstream file('data.txt');",
+      "ofstream file('data.txt', ios::in);",
+      "ofstream file('data.txt', ios::binary);",
+      "ofstream file('data.txt', ios::out | ios::binary);"
+    ],
+    "correctAnswer": "ofstream file('data.txt', ios::out | ios::binary);",
+    "correctOption": "D",
+    "explanation": "This opens the file in output mode (\`ios::out\`) and binary mode (\`ios::binary\`) for writing raw bytes of data."
+  },
+  {
+    "question": "Consider the following code snippet:\\n\`\`\`cpp\\n#include <iostream>\\n#include <fstream>\\n\\nint main() {\\n  std::ofstream myfile(\\"example.txt\\");\\n  if (myfile.is_open()) {\\n    myfile << \\"This is a line.\\\\n\\";\\n    myfile.close();\\n  }\\n  return 0;\\n}\\n\`\`\`\\nWhat will be the content of 'example.txt' after executing this code?",
+    "options": [
+      "The file will be empty.",
+      "The file will contain 'This is a line.\\\\n'.",
+      "The file will contain garbage data.",
+      "The program will crash."
+    ],
+    "correctAnswer": "The file will contain 'This is a line.\\\\n'.",
+    "correctOption": "B",
+    "explanation": "The code opens the file, writes the string \\"This is a line.\\\\n\\" to it, and then closes the file, persisting the written content."
+  },
+  {
+    "question": "Which function is used to read a line of text from a file stream in C++?",
+    "options": [
+      "get()",
+      "read()",
+      "getline()",
+      "write()"
+    ],
+    "correctAnswer": "getline()",
+    "correctOption": "C",
+    "explanation": "\`getline()\` reads characters from an input stream and stores them into a string until a delimiter (by default, newline) is found."
+  }
+]`,
+        },
+      ],
+    },
+  ],
+});

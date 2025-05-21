@@ -11,9 +11,19 @@ export function CourseProvider({ children }) {
     courseId: null,
   });
 
+  const [quizState, setQuizState] = useState({
+    isGenerating: false,
+    isGenerated: false,
+    courseId: null,
+  });
+
   // Function to update flashcard state across all components
   const updateFlashcardsState = (state) => {
     setFlashcardsState((prev) => ({ ...prev, ...state }));
+  };
+
+  const updateQuizState = (state) => {
+    setQuizState((prev) => ({ ...prev, ...state }));
   };
 
   return (
@@ -21,6 +31,8 @@ export function CourseProvider({ children }) {
       value={{
         flashcardsState,
         updateFlashcardsState,
+        quizState,
+        updateQuizState,
       }}>
       {children}
     </CourseContext.Provider>

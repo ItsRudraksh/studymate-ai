@@ -109,7 +109,7 @@ export default function NotesPage() {
 
   const breadcrumbItems = [
     {
-      label: courseData?.topic || "Course",
+      label: courseData?.courseContent?.courseTitle || "Course",
       href: `/course/${courseId}`,
     },
     {

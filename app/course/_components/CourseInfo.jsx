@@ -9,7 +9,7 @@ export function CourseInfo({ courseData }) {
         </div>
         <div className="w-full">
           <CardTitle className="capitalize text-base sm:text-lg">
-            {courseData?.topic || "Loading..."}
+            {courseData?.courseContent?.courseTitle || "Loading..."}
           </CardTitle>
           <p className="text-xs sm:text-sm text-gray-500 leading-[1.5] mt-2">
             {courseData?.courseContent?.courseSummary ||

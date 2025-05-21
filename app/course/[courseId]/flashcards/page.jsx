@@ -186,8 +186,8 @@ export default function FlashcardsPage() {
         `/api/studyType?courseId=${courseId}&studyType=flashcards`
       );
 
-      if (response.data.studyType && response.data.studyType.content) {
-        setFlashcards(response.data.studyType.content);
+      if (response.data.studyType && response.data.studyType.flashcardContent) {
+        setFlashcards(response.data.studyType.flashcardContent);
       } else {
         setFlashcards([]);
       }
@@ -276,7 +276,7 @@ export default function FlashcardsPage() {
 
   const breadcrumbItems = [
     {
-      label: courseData?.topic || "Course",
+      label: courseData?.courseContent?.courseTitle || "Course",
       href: `/course/${courseId}`,
     },
     {

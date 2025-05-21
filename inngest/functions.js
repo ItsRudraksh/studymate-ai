@@ -7,7 +7,11 @@ import {
   usersTable,
 } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import { genChapterNotes, genFlashCards } from "@/configs/gemini";
+import {
+  genChapterNotes,
+  genFlashCards,
+  genQuizContent,
+} from "@/configs/gemini";
 import { v4 as uuid } from "uuid";
 
 export const createNewUser = inngest.createFunction(
@@ -119,35 +123,59 @@ export const generateStudyType = inngest.createFunction(
   async ({ event, step }) => {
     const { studyType, prompt, courseId } = event.data;
 
-    const flashCardAIRes = await step.run("Generating Flashcards", async () => {
-      const res = await genFlashCards.sendMessage(prompt);
-      const aiRes = JSON.parse(res.response.text());
-      return aiRes;
-    });
+    let columnToUpdate;
+    let aiGeneratedContent;
 
-    const updateStudyType = await step.run("Updating Study Type", async () => {
-      await db
-        .update(studyTypeTable)
-        .set({
-          content: flashCardAIRes,
-        })
-        .where(eq(studyTypeTable.courseId, courseId))
-        .where(eq(studyTypeTable.studyType, studyType));
-      return "Study Type Updated Successfully";
-    });
-
-    // Update notes status to indicate flashcards generation is complete
     if (studyType === "flashcards") {
-      const updateStatus = await step.run(
-        "Update Flashcards Status",
-        async () => {
-          await db
-            .update(notesTable)
-            .set({ flashcardsGenerated: true })
-            .where(eq(notesTable.courseId, courseId));
-          return "Flashcards Status Updated Successfully";
-        }
-      );
+      columnToUpdate = "flashcardContent";
+      aiGeneratedContent = await step.run("Generating Flashcards", async () => {
+        const res = await genFlashCards.sendMessage(prompt);
+        const aiRes = JSON.parse(res.response.text());
+        return aiRes;
+      });
+    } else if (studyType === "quiz") {
+      columnToUpdate = "quizContent";
+      aiGeneratedContent = await step.run("Generating Quiz", async () => {
+        const res = await genQuizContent.sendMessage(prompt);
+        const aiRes = JSON.parse(res.response.text());
+        return aiRes;
+      });
+    } else {
+      // Handle other study types or throw an error
+      console.error(`Unsupported study type: ${studyType}`);
+      return "Unsupported study type";
+    }
+
+    if (aiGeneratedContent) {
+      await step.run("Updating Study Type", async () => {
+        await db
+          .update(studyTypeTable)
+          .set({
+            [columnToUpdate]: aiGeneratedContent,
+          })
+          .where(eq(studyTypeTable.courseId, courseId))
+          .where(eq(studyTypeTable.studyType, studyType)); // Ensure we update the correct record
+        return "Study Type Updated Successfully";
+      });
+    }
+
+    // Update notes status to indicate flashcards or quiz generation is complete
+    if (studyType === "flashcards") {
+      await step.run("Update Flashcards Status", async () => {
+        await db
+          .update(notesTable)
+          .set({ flashcardsGenerated: true })
+          .where(eq(notesTable.courseId, courseId));
+        return "Flashcards Status Updated Successfully";
+      });
+    } else if (studyType === "quiz") {
+      await step.run("Update Quiz Status", async () => {
+        await db
+          .update(notesTable)
+          .set({ quizGenerated: true }) // Assuming you have a quizGenerated field
+          .where(eq(notesTable.courseId, courseId));
+        return "Quiz Status Updated Successfully";
+      });
     }
   }
 );

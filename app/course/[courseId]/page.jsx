@@ -19,6 +19,7 @@ function CoursePage() {
     try {
       const res = await axios.get(`/api/courses/?courseId=${courseId}`);
       setCourseData(res.data.result);
+      console.log(res.data.result);
     } catch (error) {
       console.error("Error fetching course:", error);
     }
@@ -26,7 +27,7 @@ function CoursePage() {
 
   const breadcrumbItems = [
     {
-      label: courseData?.topic || "Course",
+      label: courseData?.courseContent?.courseTitle || "Course",
       href: `/course/${courseId}`,
     },
   ];
