@@ -301,22 +301,12 @@ studymate-ai/
 │   ├── course/               # Course-specific pages
 │   │   ├── [courseId]/       # Dynamic route for a specific course
 │   │   │   ├── flashcards/   # Flashcards page and components
-│   │   │   │   └── page.jsx
-│   │   │   │   └── layout.jsx
 │   │   │   ├── notes/        # Notes page and components
-│   │   │   │   └── _components/
-│   │   │   │   └── page.jsx
-│   │   │   │   └── layout.jsx
-│   │   │   ├── quiz/         # Quiz page and components (NEW)
-│   │   │   │   └── page.jsx
-│   │   │   │   └── layout.jsx
+│   │   │   ├── quiz/         # Quiz page and components
 │   │   │   └── layout.jsx    # Layout for a specific course
 │   │   └── _components/      # Shared components for course pages (e.g., StudyMaterial.jsx)
 │   ├── create/               # Page for creating new courses
-│   │   └── page.jsx
 │   ├── dashboard/            # User dashboard
-│   │   └── _components/
-│   │   └── page.jsx
 │   ├── context/              # React Context providers (e.g., CourseContext.jsx)
 │   ├── layout.jsx            # Root layout
 │   └── page.jsx              # Root page (homepage)
