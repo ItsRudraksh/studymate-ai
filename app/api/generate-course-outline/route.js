@@ -14,11 +14,11 @@ export async function POST(request) {
       - For each chapter, a detailed topic list formatted in JSON.
       Ensure the material is clear, logically organized, and appropriate for the specified course type and difficulty level.`;
 
-    const aiCall = await createCourse.sendMessage(prompt);
+    const aiCall = await createCourse.sendMessage({ message: prompt });
 
     let aiRes;
     try {
-      aiRes = JSON.parse(aiCall.response.text());
+      aiRes = JSON.parse(aiCall.text);
     } catch (parseError) {
       return NextResponse.json(
         { error: "Invalid AI response format" },

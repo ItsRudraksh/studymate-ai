@@ -83,9 +83,9 @@ export const generateChapterNotes = inngest.createFunction(
           If a type is provided ${type}, tailor the content accordingly. If the type is other or none given, generate general material.
           `;
 
-        let aiResult = (await genChapterNotes.sendMessage(prompt)).response
-          .text()
-          .trim();
+        let aiResult = (
+          await genChapterNotes.sendMessage({ message: prompt })
+        ).text.trim();
 
         // Remove markdown code block markers if they exist
         if (aiResult.startsWith("```html")) {
@@ -128,15 +128,15 @@ export const generateStudyType = inngest.createFunction(
 
     if (studyType === "flashcards") {
       aiGeneratedContent = await step.run("Generating Flashcards", async () => {
-        const res = await genFlashCards.sendMessage(prompt);
-        const aiRes = JSON.parse(res.response.text());
+        const res = await genFlashCards.sendMessage({ message: prompt });
+        const aiRes = JSON.parse(res.text);
         return aiRes;
       });
       valuesToUpsert.flashcardContent = aiGeneratedContent;
     } else if (studyType === "quiz") {
       aiGeneratedContent = await step.run("Generating Quiz", async () => {
-        const res = await genQuizContent.sendMessage(prompt);
-        const aiRes = JSON.parse(res.response.text());
+        const res = await genQuizContent.sendMessage({ message: prompt });
+        const aiRes = JSON.parse(res.text);
         return aiRes;
       });
       valuesToUpsert.quizContent = aiGeneratedContent;

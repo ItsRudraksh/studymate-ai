@@ -1,7 +1,7 @@
 import React from "react";
 
 export const metadata = {
-  title: "StudyMate | Quiz",
+  title: "Quiz | StudyMate AI",
   description: "Test your knowledge with interactive quizzes",
 };
 

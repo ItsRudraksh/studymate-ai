@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Image } from "next/image";
+import Link from "next/link";
 
 const items = [
   {
@@ -36,12 +38,16 @@ function SideBar() {
       <Sidebar variant="sidebar">
         {/* Logo */}
         <div className="p-4">
-          <div className="flex items-center gap-2 px-2">
-            <div className="bg-blue-500 p-2 rounded-lg">
-              <Notebook className="w-4 h-4 text-white" />
+          <Link href="/">
+            <div className="flex items-center gap-2 px-2">
+              <img
+                src="/favicon-256x256.png"
+                alt="StudyMate AI"
+                className="w-10 h-10 object-cover border-2 border-gray-500 rounded-lg"
+              />
+              <span className="font-semibold text-lg">StudyMate AI</span>
             </div>
-            <span className="font-semibold text-lg">StudyMate AI</span>
-          </div>
+          </Link>
           <Button
             asChild
             className="w-full mt-4 bg-blue-500 hover:bg-blue-600">

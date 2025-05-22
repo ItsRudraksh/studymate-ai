@@ -12,6 +12,9 @@ const OutfitSans = Outfit({
 export const metadata = {
   title: "StudyMate AI",
   description: "StudyMate AI is a platform that helps you learn new things",
+  icons: {
+    icon: "/favicon-16x16.png",
+  },
 };
 
 export default function RootLayout({ children }) {

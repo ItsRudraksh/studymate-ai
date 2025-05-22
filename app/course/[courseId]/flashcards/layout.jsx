@@ -1,7 +1,7 @@
 import React from "react";
 
 export const metadata = {
-  title: "StudyMate | Flashcards",
+  title: "Flashcards | StudyMate",
   description: "Study with flashcards",
 };
 

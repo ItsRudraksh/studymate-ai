@@ -187,7 +187,7 @@ export function StudyMaterial({ courseData: initialCourseData }) {
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Study Material</h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Notes/Chapters Card */}
         <Card>
           <CardContent className="pt-6 text-center">
@@ -275,7 +275,7 @@ export function StudyMaterial({ courseData: initialCourseData }) {
         </Card>
 
         {/* Question/Answer Card */}
-        <Card>
+        {/* <Card>
           <CardContent className="pt-6 text-center">
             <div className="mb-4">❓</div>
             <h3 className="font-semibold">Question/Answer</h3>
@@ -286,7 +286,7 @@ export function StudyMaterial({ courseData: initialCourseData }) {
               Generate (Add in next Phase)
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Flashcards Generation Modal */}
