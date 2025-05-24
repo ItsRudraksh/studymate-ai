@@ -320,6 +320,11 @@ export function StudyMaterial({ courseData: initialCourseData }) {
                   <SelectItem value="15">15 cards</SelectItem>
                   <SelectItem value="20">20 cards</SelectItem>
                   <SelectItem value="25">25 cards</SelectItem>
+                  <SelectItem value="30">30 cards</SelectItem>
+                  <SelectItem value="35">35 cards</SelectItem>
+                  <SelectItem value="40">40 cards</SelectItem>
+                  <SelectItem value="45">45 cards</SelectItem>
+                  <SelectItem value="50">50 cards</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -361,6 +366,11 @@ export function StudyMaterial({ courseData: initialCourseData }) {
                   <SelectItem value="15">15 questions</SelectItem>
                   <SelectItem value="20">20 questions</SelectItem>
                   <SelectItem value="25">25 questions</SelectItem>
+                  <SelectItem value="30">30 questions</SelectItem>
+                  <SelectItem value="35">35 questions</SelectItem>
+                  <SelectItem value="40">40 questions</SelectItem>
+                  <SelectItem value="45">45 questions</SelectItem>
+                  <SelectItem value="50">50 questions</SelectItem>
                 </SelectContent>
               </Select>
             </div>

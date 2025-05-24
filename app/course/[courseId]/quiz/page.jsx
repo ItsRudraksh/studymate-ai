@@ -315,7 +315,7 @@ export default function QuizPage() {
                     <SelectValue placeholder="Number of questions" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[5, 10, 15, 20, 25].map((num) => (
+                    {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((num) => (
                       <SelectItem
                         key={num}
                         value={String(num)}>
@@ -379,7 +379,7 @@ export default function QuizPage() {
                     <SelectValue placeholder="Number of questions" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[5, 10, 15, 20, 25].map((num) => (
+                    {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((num) => (
                       <SelectItem
                         key={num}
                         value={String(num)}>
@@ -407,7 +407,7 @@ export default function QuizPage() {
     <div className="p-6 max-w-4xl mx-auto">
       <BreadcrumbNav items={breadcrumbItems} />
       <h1 className="text-3xl font-bold my-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
-        {courseDetails?.topic || "Quiz"}
+        {courseDetails?.courseContent?.courseTitle || "Quiz"}
       </h1>
 
       {quizData.map((question, qIndex) => (
